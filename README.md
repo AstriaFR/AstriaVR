@@ -33,7 +33,7 @@ Codec, resolution and format support depends on the device and available Android
 1. Install an APK built from this source, open the playlist and add local videos through the system file picker.
 2. Select a viewing mode, source projection and video layout. Override detection when necessary.
 3. Adjust IPD, field of view and lens correction for your phone and headset.
-4. Switch to English using **Language**, below **Picture** in the left settings column.
+4. English is selected on first launch. Use **Language**, below **Picture** in the left settings column, to switch between English and Chinese. Existing language preferences are retained.
 
 Playback positions are saved. Natural playback stops at the end rather than automatically advancing to another video.
 
