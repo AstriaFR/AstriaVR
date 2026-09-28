@@ -37,12 +37,6 @@ Codec, resolution and format support depends on the device and available Android
 
 Playback positions are saved. Natural playback stops at the end rather than automatically advancing to another video.
 
-## Version 4.3
-
-Adds Chinese / English switching, keeps settings in two columns, places Language below Picture and directly toggles settings with two choices. More compact headers and playlist rows preserve thumbnail and text sizes.
-
-[Changelog](CHANGELOG.md) · [Build guide](docs/BUILDING.md) · [Report an issue](../../issues)
-
 ## Build
 
 Install JDK 17 or 21 and Android SDK 36 with Build Tools 36.0.0. The project uses AGP 9.0.1 and Gradle 9.1.0.
