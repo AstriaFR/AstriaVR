@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AstriaVR</string>
+    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:alertDialogTheme">@style/LocalDialogTheme</item>
+        <item name="android:colorAccent">#87D9FF</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <style name="ConfirmationTheme" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">0dp</item>
+        <item name="android:windowMinWidthMinor">0dp</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.64</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:colorAccent">#87D9FF</item>
+    </style>
+    <style name="LocalDialogTheme" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#87D9FF</item>
+        <item name="android:colorControlNormal">#B5C7E2</item>
+        <item name="android:colorControlActivated">#87D9FF</item>
+        <item name="android:textColorPrimary">#F4F8FF</item>
+        <item name="android:textColorSecondary">#B5C7E2</item>
+        <item name="android:colorBackground">#0C1935</item>
+        <item name="android:windowBackground">@drawable/dialog_panel</item>
+        <item name="android:windowMinWidthMajor">60%</item>
+        <item name="android:windowMinWidthMinor">88%</item>
+        <item name="android:backgroundDimAmount">0.65</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
+
