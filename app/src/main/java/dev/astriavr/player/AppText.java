@@ -39,7 +39,7 @@ public enum AppText {
     BRIGHTNESS_N_VOLUME("← → 亮度减 / 加\n↑ ↓ 音量加 / 减", "← → Brightness − / +\n↑ ↓ Volume + / −"),
     CONTROLLER_DIAGRAM_LEFT_STICK_AT_UPPER("手柄线图：左摇杆在左上，方向键在左下，右摇杆在右下；Y 上、X 左、B 右、A 下，中间三横线为菜单键。", "Controller diagram: left stick at upper left, D-pad at lower left, right stick at lower right. Y above, X left, B right, A below. The three-line button in the center is Menu."),
     PLAYLIST_CHOOSE_A_VIDEO("播放列表 · 选片", "Playlist · Choose a video"),
-    MENU_START_RIGHT_EYE_PLAYLIST("MENU / START · 右眼播放列表", "MENU / START · Right-eye playlist"),
+    MENU_START_VR_PLAYLIST("MENU / START · 双眼播放列表", "MENU / START · Binocular playlist"),
     TAP_THE_PLAYLIST_ICON_IN_THE("点击上栏列表图标；点击封面续播，更多操作中可移出记录。", "Tap the playlist icon in the top bar, then a cover to resume. Use video actions to remove an entry."),
     MENU_OPEN_CLOSE_SELECT_RESUME("菜单键呼出 / 关闭  ·  ← → 选择视频  ·  ↑ 确认并续播", "Menu: open / close · ← → Select · ↑ Resume"),
     NO_JAVA_EXCEPTIONS_HAVE_BEEN_RECORDED("暂无已捕获的 Java 异常。", "No Java exceptions have been recorded."),
@@ -152,7 +152,7 @@ public enum AppText {
     ADJUST_FOR_A_COMFORTABLE_VIEW("戴着不舒服，先调参数", "Adjust for a comfortable view"),
     IPD_SETS_THE_SPACING_BETWEEN_THE("瞳距决定双眼画面的位置，视场角决定能看多宽，镜头补偿用来适配眼镜的畸变。调试模式会暂停视频，显示网格、边界和中心点，便于对齐；视频实际开始播放时会自动退出调试。参数不是越大越好，适合自己的眼镜和眼睛更重要。", "IPD sets the spacing between the eye views, field of view controls how wide you can see, and lens correction compensates for headset distortion. Comfort tuning pauses the video and shows a grid, boundaries and center points for alignment; it ends when video playback starts. Choose settings that suit your headset and eyes, rather than simply maximizing them."),
     USEFUL_DETAILS("几个容易混淆的小细节", "Useful details"),
-    IN_DUAL_LENS_MODE_PRESS_MENU("双镜头模式按菜单键可在右眼选片。播放结束或退到片头暂停后，稍作停顿，再双击对应侧画面或快进、快退按钮，可按列表顺序切换视频，首尾循环。移出播放记录不会删除原文件；文件移动或授权失效时，重新添加即可。", "In dual-lens mode, press Menu to choose a video in the right eye. At the end, or when paused at the beginning, wait briefly, then double-tap the corresponding side or seek button to move through the playlist, wrapping at both ends. Removing an entry does not delete the original file. Add a video again if it has moved or access has expired."),
+    IN_DUAL_LENS_MODE_PRESS_MENU("双镜头模式按菜单键可打开双眼同步显示的播放列表。播放结束或退到片头暂停后，稍作停顿，再双击对应侧画面或快进、快退按钮，可按列表顺序切换视频，首尾循环。移出播放记录不会删除原文件；文件移动或授权失效时，重新添加即可。", "In dual-lens mode, press Menu to open the playlist in both eyes. At the end, or when paused at the beginning, wait briefly, then double-tap the corresponding side or seek button to move through the playlist, wrapping at both ends. Removing an entry does not delete the original file. Add a video again if it has moved or access has expired."),
     THIS_SCREEN_SUPPORTS_CIRCULAR_VIEWS_UP("当前屏幕最多支持 {0} cm 圆形视场", "This screen supports circular views up to {0} cm"),
     DEFAULT_SETTINGS_RESTORED("已恢复默认设置", "Default settings restored"),
     FIELD_DIAMETER_ADJUSTED_TO_CM("视场已适配为 {0} cm", "Field diameter adjusted to {0} cm"),
@@ -303,7 +303,7 @@ public enum AppText {
     THIS_PROJECTION_TAG_IS_NOT_YET(" · 此投影标记暂不支持", " · This projection tag is not yet supported"),
     APPLICATION_STARTUP("Application 启动", "Application startup"),
     N_N_ANDROID_API_N_PHASE("\n                {0}\n                {1} {2} / Android {3} / API {4}\n                阶段：{5}\n                线程：{6}\n                时间：{7}\n\n                {8}\n            ", "\n                {0}\n                {1} {2} / Android {3} / API {4}\n                Phase: {5}\n                Thread: {6}\n                Time: {7}\n\n                {8}\n            "),
-    RIGHT_EYE_PLAYLIST_LEFT_RIGHT_TO("右眼播放列表：左右选择，上键播放，菜单键退出，也可触屏关闭", "Right-eye playlist: left / right to select, up to play, Menu to exit. You can also tap to close."),
+    VR_PLAYLIST_LEFT_RIGHT_TO("双眼播放列表：左右选择，上键播放，菜单键退出，也可触屏关闭", "Binocular playlist: left / right to select, up to play, Menu to exit. You can also tap to close."),
     COULD_NOT_LOAD_PLAYLIST("列表读取失败", "Could not load playlist"),
     PLAYLIST_IS_EMPTY("列表为空", "Playlist is empty"),
     CLOSE_AND_TRY_AGAIN("请关闭后重试", "Close and try again"),
@@ -320,7 +320,7 @@ public enum AppText {
     DRAWING_VR_FRAME("绘制VR画面", "Drawing VR frame"),
     COULD_NOT_UPDATE_VIDEO_TEXTURE("视频纹理更新失败：{0}", "Could not update video texture: {0}");
 
-    private static volatile boolean english = true;
+    private static volatile boolean english = false;
     private static final Pattern ARGUMENT = Pattern.compile("\\{(\\d+)\\}");
     private final String chinese;
     private final String translated;

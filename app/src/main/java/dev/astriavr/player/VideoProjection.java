@@ -2,6 +2,7 @@ package dev.astriavr.player;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Source projection IDs are also persisted in the playlist. Layout: 0 SBS, 1 TB, 2 mono. */
@@ -59,10 +60,26 @@ public final class VideoProjection {
     private static Pattern token(String token) {
         return Pattern.compile("(?<![a-z0-9])(?:" + token + ")(?![a-z0-9])", Pattern.CASE_INSENSITIVE);
     }
+    // Split complete runs of known tags, not arbitrary substrings in titles or serial numbers.
+    private static final String COMPACT_TAG = "hsbs|fsbs|sbs|htb|ftb|tb|ou|lr|vr|3d|180|360";
+    private static final Pattern COMPACT_TAGS = token("(?:" + COMPACT_TAG + "){2,}");
+    private static final Pattern EACH_TAG = Pattern.compile(COMPACT_TAG, Pattern.CASE_INSENSITIVE);
+    private static String detectionName(String name) {
+        Matcher runs = COMPACT_TAGS.matcher(name);
+        StringBuffer result = new StringBuffer();
+        while (runs.find()) {
+            Matcher tags = EACH_TAG.matcher(runs.group());
+            StringBuilder separated = new StringBuilder();
+            while (tags.find()) separated.append(tags.group()).append(' ');
+            runs.appendReplacement(result, Matcher.quoteReplacement(separated.toString().trim()));
+        }
+        runs.appendTail(result);
+        return result.toString();
+    }
     private static final Pattern HALF = token("(?:vr[ _-]?)?180(?:[ _-]?(?:vr|deg|degrees))?");
     private static final Pattern FULL = token("(?:vr[ _-]?)?360(?:[ _-]?(?:vr|deg|degrees))?");
-    private static final Pattern SBS = token("sbs|hsbs|fsbs|lr|side[ _-]?by[ _-]?side");
-    private static final Pattern TB = token("tb|ou|over[ _-]?under|top[ _-]?bottom");
+    private static final Pattern SBS = token("sbs|hsbs|fsbs|lr|side[ _-]?by[ _-]?side|左右格式|左右3d|3d左右|左右半宽|左右全宽");
+    private static final Pattern TB = token("tb|htb|ftb|ou|over[ _-]?under|top[ _-]?bottom|上下格式|上下3d|3d上下|上下半高|上下全高");
     private static final Pattern MONO = token("mono|2d");
     private static final Pattern VR = token("vr|3d|spherical|equirectangular|panorama");
     private static final Pattern FISHEYE = token("(?:single[ _-]?)?fisheye(?:[ _-]?180)?");
@@ -74,6 +91,7 @@ public final class VideoProjection {
     private static final Pattern FISHEYE_FULL = token("(?:d?fisheye|dualfisheye)[ _-]?360");
     private static final Pattern FISHEYE_HALF = token("(?:d?fisheye|dualfisheye)[ _-]?180");
     public static int namedProjection(String name) {
+        name = detectionName(name);
         if (ANGULAR.matcher(name).find()) return EAC;
         if (CUBE.matcher(name).find()) return CUBEMAP;
         boolean dual = DUAL_FISHEYE.matcher(name).find() || name.contains("双鱼眼") || name.contains("双目鱼眼");
@@ -90,25 +108,29 @@ public final class VideoProjection {
         return namedDegrees(name);
     }
 
-    /** Plain 16:9 and 2:1 videos must not inherit the old default 180-degree VR fallback. */
+    /** Untagged 2:1 sources use the same VR180 SBS fallback as resolve(); manual mode wins at the caller. */
     public static boolean isVrVideo(String name, boolean projectionMetadata, int stereoLayout,
             int width, int height, float pixelRatio) {
+        name = detectionName(name);
         if (projectionMetadata || stereoLayout == 0 || stereoLayout == 1 || namedProjection(name) > 0) return true;
         if (HALF.matcher(name).find() || FULL.matcher(name).find() || SBS.matcher(name).find()
                 || TB.matcher(name).find() || VR.matcher(name).find()
                 || name.contains("全景") || name.contains("左右格式") || name.contains("上下格式")) return true;
-        // 4:1 is a strong stereo-panorama hint; 2:1 alone is ambiguous and remains ordinary.
+        // 2:1 is shared by SBS 180 and mono 360. Both need VR playback, even without filename tags.
         return width > 0 && height > 0 && Float.isFinite(pixelRatio) && pixelRatio > 0
-                && near(width * (double) pixelRatio / height, 4);
+                && (near(width * (double) pixelRatio / height, 2)
+                    || near(width * (double) pixelRatio / height, 4));
     }
 
     public static int namedDegrees(String name) {
+        name = detectionName(name);
         boolean half = HALF.matcher(name).find();
         boolean full = FULL.matcher(name).find();
         return half == full ? 0 : half ? 180 : 360;
     }
 
     public static int namedLayout(String name) {
+        name = detectionName(name);
         boolean sbs = SBS.matcher(name).find();
         boolean tb = TB.matcher(name).find();
         boolean mono = MONO.matcher(name).find();

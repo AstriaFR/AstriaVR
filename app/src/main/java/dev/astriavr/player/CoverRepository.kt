@@ -227,8 +227,21 @@ class CoverRepository(context: Context, private val store: PlaylistStore) {
                 }
             }
             val frameLimit = if (ordinary) 640 else 1536
-            val frame = retriever.getScaledFrameAtTime(CoverProjection.sampleTimeUs(duration),
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC, frameLimit, frameLimit) ?: return null
+            val sampleTime = CoverProjection.sampleTimeUs(duration)
+            val frame = (if (Build.VERSION.SDK_INT >= 27) {
+                retriever.getScaledFrameAtTime(sampleTime,
+                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC, frameLimit, frameLimit)
+            } else {
+                // Android 8.0 has no scaled-frame API. Shrink before allocating projection pixels.
+                retriever.getFrameAtTime(sampleTime, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)?.let { original ->
+                    val edge = maxOf(original.width, original.height)
+                    if (edge <= frameLimit) original else try {
+                        Bitmap.createScaledBitmap(original,
+                            (original.width.toLong() * frameLimit / edge).toInt().coerceAtLeast(1),
+                            (original.height.toLong() * frameLimit / edge).toInt().coerceAtLeast(1), true)
+                    } finally { original.recycle() }
+                }
+            }) ?: return null
             try {
                 if (ordinary) return cropEmbedded(frame, 2)
                 val input = IntArray(frame.width * frame.height)

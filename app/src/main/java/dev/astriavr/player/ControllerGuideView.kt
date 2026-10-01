@@ -70,7 +70,7 @@ class ControllerGuideView(context: Context) : LinearLayout(context) {
             setPadding(dp(14), dp(12), dp(14), dp(12))
             background = UiStyle.shape(context, 0x8C203B70.toInt(), 12, UiStyle.LINE)
         }
-        selection.addView(UiStyle.label(context, if (phoneMode) AppText.PLAYLIST_CHOOSE_A_VIDEO.text() else AppText.MENU_START_RIGHT_EYE_PLAYLIST.text(), 13f, UiStyle.ACCENT, true))
+        selection.addView(UiStyle.label(context, if (phoneMode) AppText.PLAYLIST_CHOOSE_A_VIDEO.text() else AppText.MENU_START_VR_PLAYLIST.text(), 13f, UiStyle.ACCENT, true))
         selection.addView(UiStyle.label(context,
             if (phoneMode) AppText.TAP_THE_PLAYLIST_ICON_IN_THE.text()
             else AppText.MENU_OPEN_CLOSE_SELECT_RESUME.text(), 11f, UiStyle.TEXT),

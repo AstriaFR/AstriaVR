@@ -60,7 +60,9 @@ for (const v of ['mipmap-anydpi-v26','mipmap-anydpi-v33']) {
   fs.writeFileSync(path.join(res,v,'ic_launcher.xml'),`<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n    <background android:drawable="@drawable/astria_icon_background"/>\n    <foreground android:drawable="@drawable/astria_icon_foreground"/>\n${v.endsWith('33')?'    <monochrome android:drawable="@drawable/astria_icon_monochrome"/>\n':''}</adaptive-icon>\n`);
 }
 // The selected artwork is full-bleed: Android masks its image directly, without an inner square.
-fs.writeFileSync(path.join(res,'mipmap-anydpi-v33/ic_launcher_compat.xml'),`<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n    <background android:drawable="@drawable/astria_launcher_art"/>\n    <foreground android:drawable="@android:color/transparent"/>\n</adaptive-icon>\n`);
+for (const v of ['mipmap-anydpi-v26','mipmap-anydpi-v33']) {
+ fs.writeFileSync(path.join(res,v,'ic_launcher_compat.xml'),`<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n    <background android:drawable="@drawable/astria_launcher_art"/>\n    <foreground android:drawable="@android:color/transparent"/>\n</adaptive-icon>\n`);
+}
 // Custom lettering: AstriaVR. No font dependency, consistent contours on all phones.
 const mark=[
  P('M3,24 C9,29 25,25 30,17 C33,10 24,8 17,12',blue,.8,'none',.55),star(17,18,10,ice),star(30,5,1.7,blue),circle(6,8,.8,null,0,blue,.8),
@@ -117,11 +119,7 @@ async function previews(){
  const launcherArtwork=path.join(source,'launcher-astria-4.1.png');
  await sharp(launcherArtwork).webp({quality:92,effort:6}).toFile(path.join(res,'drawable-nodpi/astria_launcher_art.webp'));
  fs.rmSync(path.join(res,'drawable-nodpi/astria_launcher_art.png'),{force:true});
- for (const [density,size] of [['mdpi',48],['hdpi',72],['xhdpi',96],['xxhdpi',144],['xxxhdpi',192]]) {
-  const folder=path.join(res,`mipmap-${density}`);fs.mkdirSync(folder,{recursive:true});
-  await sharp(launcherArtwork).resize(size,size).webp({lossless:true,effort:6}).toFile(path.join(folder,'ic_launcher_compat.webp'));
-  fs.rmSync(path.join(folder,'ic_launcher_compat.png'),{force:true});
- }
+ // minSdk 26: every supported system uses the adaptive icon; no legacy density bitmaps.
  for(const [name,w] of [['ic_launcher',432],['astria_wordmark',864],['controller_sketch',1200]]) {
   const buffer=await (name==='ic_launcher'?sharp(launcherArtwork):sharp(path.join(source,name+'.svg'),{density:192})).resize({width:w}).png().toBuffer();
   await sharp({create:{width:w,height:name==='ic_launcher'?w:Math.round(w*(name==='astria_wordmark'?42/216:270/400)),channels:4,background:'#0D1527'}}).composite([{input:buffer}]).png().toFile(path.join(out,name+'-preview.png'));

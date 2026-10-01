@@ -13,10 +13,10 @@ android {
     buildToolsVersion = "36.0.0"
     defaultConfig {
         applicationId = "dev.astriavr.player"
-        minSdk = 28
+        minSdk = 26
         targetSdk = 36
-        versionCode = 27
-        versionName = "4.3"
+        versionCode = 31
+        versionName = "4.4"
         testInstrumentationRunner = "android.test.InstrumentationTestRunner"
     }
     compileOptions {

@@ -613,7 +613,9 @@ class PlaylistPage(context: Context, private val store: PlaylistStore, private v
         layer.alpha=0f; scroll.translationX=dp(32).toFloat()
         layer.animate().alpha(1f).setDuration(UiStyle.motionDuration(180)).start()
         scroll.animate().translationX(0f).setDuration(UiStyle.motionDuration(240)).setInterpolator(UiStyle.easing).start()
-        scroll.accessibilityPaneTitle=AppText.VIDEO_ACTIONS_254.text(entry.name)
+        val paneTitle = AppText.VIDEO_ACTIONS_254.text(entry.name)
+        if (android.os.Build.VERSION.SDK_INT >= 28) scroll.accessibilityPaneTitle = paneTitle
+        else scroll.announceForAccessibility(paneTitle)
         scroll.requestFocus()
     }
     private fun dismissActions(action:(()->Unit)?=null) {

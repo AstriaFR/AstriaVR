@@ -6,12 +6,11 @@
 
 English · [简体中文](README.zh-CN.md)
 
-Watch on your phone or through a dual-lens VR headset, with playlists, saved playback positions, controller input and adjustable optics. AstriaVR features a blue-purple nebula theme and Chinese / English interfaces.
+Watch on your phone or through a dual-lens VR headset, with playlists, saved playback positions, controller input and adjustable optics. AstriaVR features a blue-purple nebula theme.
 
 | Item | Details |
 | --- | --- |
-| Version | 4.3 (versionCode 27) |
-| Requirements | Android 9 / API 28+, OpenGL ES 2.0 |
+| Requirements | Android 8.0 / API 26+, OpenGL ES 2.0 |
 | Languages | Kotlin, Java |
 | Playback | AndroidX Media3 / ExoPlayer |
 | Application ID | `dev.astriavr.player` |
@@ -24,7 +23,6 @@ Watch on your phone or through a dual-lens VR headset, with playlists, saved pla
 - List and grid playlists, thumbnails, sorting and saved playback positions.
 - IPD, field of view, lens correction, brightness and playback speed adjustments. Comfort tuning provides an alignment grid.
 - Touch, gamepad and gyroscope controls, plus an in-app controller guide.
-- English by default, with Chinese and English settings, playlists, prompts and control instructions. Switching languages retains the current video, position and playback state.
 
 Codec, resolution and format support depends on the device and available Android decoders. A gyroscope is optional.
 
@@ -33,7 +31,6 @@ Codec, resolution and format support depends on the device and available Android
 1. Install an APK built from this source, open the playlist and add local videos through the system file picker.
 2. Select a viewing mode, source projection and video layout. Override detection when necessary.
 3. Adjust IPD, field of view and lens correction for your phone and headset.
-4. English is selected on first launch. Use **Language**, below **Picture** in the left settings column, to switch between English and Chinese. Existing language preferences are retained.
 
 Playback positions are saved. Natural playback stops at the end rather than automatically advancing to another video.
 

@@ -8,7 +8,7 @@ import android.text.TextUtils
 import android.view.View
 import kotlin.math.abs
 
-/** Fixed dp HUD, centered and clipped to the right eye. Optical placement stays physical. */
+/** One shared playlist, drawn at the same relative position in each calibrated eye viewport. */
 class VrPlaylistView(context: Context, private val store: PlaylistStore, private val covers: CoverRepository,
     dismiss: () -> Unit) : View(context) {
     var settings = RenderSettings()
@@ -38,7 +38,7 @@ class VrPlaylistView(context: Context, private val store: PlaylistStore, private
     }
     init {
         visibility=GONE; isClickable=true
-        contentDescription=AppText.RIGHT_EYE_PLAYLIST_LEFT_RIGHT_TO.text()
+        contentDescription=AppText.VR_PLAYLIST_LEFT_RIGHT_TO.text()
         setOnClickListener { dismiss() }
     }
     fun show(uri:String?) {
@@ -102,9 +102,13 @@ class VrPlaylistView(context: Context, private val store: PlaylistStore, private
     override fun onDraw(canvas:Canvas) {
         if(settings.phoneMode) return
         val layout=opticalLayout
-        val x=layout.rightX.toFloat(); val y=height-layout.y-layout.eyeHeight.toFloat()
+        val y=height-layout.y-layout.eyeHeight.toFloat()
         val w=layout.eyeWidth.toFloat(); val h=layout.eyeHeight.toFloat()
         if(w<=0 || h<=0) return
+        drawEye(canvas,layout.leftX.toFloat(),y,w,h)
+        drawEye(canvas,layout.rightX.toFloat(),y,w,h)
+    }
+    private fun drawEye(canvas:Canvas,x:Float,y:Float,w:Float,h:Float) {
         canvas.save()
         clip.reset(); clip.addOval(x,y,x+w,y+h,Path.Direction.CW); canvas.clipPath(clip)
         val density=resources.displayMetrics.density

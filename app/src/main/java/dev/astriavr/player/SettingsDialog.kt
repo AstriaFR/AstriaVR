@@ -42,7 +42,8 @@ open class SettingsDialog(
             background = UiStyle.glass(context, UiStyle.MODAL, 22)
         }
         title = UiStyle.label(context, heading, if (scrollContent) 20f else 18f, bold = true).apply {
-            isAccessibilityHeading = true; maxLines = 2
+            if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
+            maxLines = 2
         }
         card.addView(title, LinearLayout.LayoutParams(-1, -2))
         body = if (scrollContent) object : ScrollView(context) {

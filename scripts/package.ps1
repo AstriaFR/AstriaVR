@@ -15,7 +15,7 @@ $sourceFiles = @(
     foreach ($folder in @('app/src', 'scripts', 'tests', 'docs', 'gradle', '.github')) {
         Get-ChildItem -LiteralPath (Join-Path $projectDir $folder) -Recurse -File
     }
-    foreach ($file in @('README.md', 'README.zh-CN.md', 'CHANGELOG.md', 'CONTRIBUTING.md', '.gitignore', '.gitattributes', 'gradlew', 'gradlew.bat', 'build.gradle.kts', 'settings.gradle.kts',
+    foreach ($file in @('README.md', 'README.zh-CN.md', 'CONTRIBUTING.md', '.gitignore', '.gitattributes', 'gradlew', 'gradlew.bat', 'build.gradle.kts', 'settings.gradle.kts',
         'gradle.properties', 'toolchain.lock.json', 'app/build.gradle.kts', 'app/proguard-rules.pro')) {
         Get-Item -LiteralPath (Join-Path $projectDir $file)
     }

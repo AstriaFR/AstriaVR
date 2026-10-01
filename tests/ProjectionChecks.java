@@ -23,7 +23,7 @@ public final class ProjectionChecks {
     }
     public static void main(String[] args) {
         equal(VideoProjection.isOrdinaryCover(-1,0,"holiday.mp4",1920,1080) ? 1 : 0,1,"unplayed ordinary cover stays flat");
-        equal(VideoProjection.isOrdinaryCover(-1,0,"wide.mp4",3840,1920) ? 1 : 0,1,"ambiguous wide cover matches ordinary playback detection");
+        equal(VideoProjection.isOrdinaryCover(-1,0,"wide.mp4",3840,1920) ? 1 : 0,0,"untagged 2:1 cover matches VR playback detection");
         equal(VideoProjection.isOrdinaryCover(-1,0,"VR180_SBS.mp4",3840,1920) ? 1 : 0,0,"named VR cover stays projected");
         equal(VideoProjection.isOrdinaryCover(-1,0,"recording.mp4",7680,1920) ? 1 : 0,0,"4:1 stereo panorama remains VR");
         equal(VideoProjection.isOrdinaryCover(0,0,"clip.mp4",1920,1080) ? 1 : 0,0,"manual stereo layout keeps VR cover");
@@ -65,6 +65,23 @@ public final class ProjectionChecks {
         selection(0,-1,360,1,"wrong_180_SBS.mp4",4096,4096,360,1,"metadata wins");
         selection(180,0,360,1,"test_360_TB.mp4",4096,4096,180,0,"manual wins");
         selection(0,-1,0,-1,"unmarked.mp4",3840,1920,180,0,"ambiguous 2:1 preserves 180 SBS");
+        equal(VideoProjection.isVrVideo("recording.mp4",false,-1,3840,1920,1) ? 1 : 0,1,"reported untagged 3840x1920 enters VR");
+        equal(VideoProjection.isVrVideo("recording.mp4",false,-1,1920,1920,2) ? 1 : 0,1,"pixel aspect ratio participates in VR detection");
+        for (int[] size : new int[][]{{1920,1080},{3840,2160},{2560,1080},{1080,1920},{1920,1920},{0,0},{-1,1920}})
+            equal(VideoProjection.isVrVideo("recording.mp4",false,-1,size[0],size[1],1) ? 1 : 0,0,"ordinary or unknown size " + size[0] + "x" + size[1]);
+        for (float pixelRatio : new float[]{0,-1,Float.NaN,Float.POSITIVE_INFINITY})
+            equal(VideoProjection.isVrVideo("recording.mp4",false,-1,3840,1920,pixelRatio) ? 1 : 0,0,"invalid pixel ratio cannot imply VR");
+        equal(VideoProjection.isFlatCover(2,0) ? 1 : 0,1,"explicit ordinary cover still wins for a saved choice");
+        for (String name : new String[]{"clip_VR180SBS.mp4","clip_1803DSBS.mp4","clip_3D180_LR.mp4"}) {
+            equal(VideoProjection.isVrVideo(name,false,-1,1920,1080,1) ? 1 : 0,1,"compact filename enters VR " + name);
+            selection(0,-1,0,-1,name,1920,1080,180,0,"compact filename " + name);
+        }
+        selection(0,-1,0,-1,"clip_VR360TB.mp4",4096,4096,360,1,"compact 360 TB");
+        selection(0,-1,0,-1,"风景_180_左右格式.mp4",1920,1080,180,0,"Chinese SBS layout");
+        selection(0,-1,0,-1,"风景_360_上下格式.mp4",1920,1080,360,1,"Chinese TB layout");
+        equal(VideoProjection.namedLayout("clip_HTB.mp4"),1,"half top-bottom layout");
+        for (String name : new String[]{"sample_360p_1180_3600.mp4","driver.mp4","club_tbrown.mp4","idVR180SBSxyz.mp4"})
+            equal(VideoProjection.isVrVideo(name,false,-1,1920,1080,1) ? 1 : 0,0,"partial words and serial numbers remain ordinary " + name);
         selection(0,-1,0,-1,"unmarked.mp4",7680,1920,360,0,"4:1 inference");
         selection(0,-1,0,2,"unmarked.mp4",3840,1920,360,2,"known mono plus 2:1");
         selection(0,-1,0,0,"unmarked.mp4",3840,1920,180,0,"known SBS plus 2:1");

@@ -17,6 +17,7 @@ public class LanguageChecks {
         return result;
     }
     public static void main(String[] args) {
+        check(!AppText.isEnglish(), "Initial catalog language is Chinese");
         Object[] values = {"片名 $1 \\ {1}.mp4", "720", "30", "4", "5", "6", "7", "8", "9"};
         for (AppText key : AppText.values()) {
             AppText.setEnglish(false); String zh = key.text();
@@ -37,6 +38,8 @@ public class LanguageChecks {
             check(VideoProjection.namedProjection("双鱼眼180.mp4") == VideoProjection.STEREO_FISHEYE_180,
                 "Chinese filename detection must be independent of UI language");
             check(VideoProjection.namedProjection("VR360_TB.mp4") == 360, "English filename detection");
+            check(VideoProjection.isVrVideo("recording.mp4", false, -1, 3840, 1920, 1), "Untagged 2:1 VR detection is language independent");
+            check(VideoProjection.namedProjection("clip_VR180SBS.mp4") == 180, "Compact filename detection is language independent");
             check(VideoProjection.label(180).equals(english ? "EQ 180°" : "等距柱状 180°"), "Projection labels");
         }
         AppText.setEnglish(false);

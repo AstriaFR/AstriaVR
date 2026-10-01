@@ -293,8 +293,8 @@ class MainActivity : Activity() {
                 PlaylistNavigation.RIGHT -> vrPlaylist.move(1)
                 PlaylistNavigation.CONFIRM -> vrPlaylist.selection()?.let { entry ->
                     closeVrPlaylist(false)
-                    openSource(Uri.parse(entry.uri), entry.position, entry.name)
                     beginControllerUse()
+                    openSource(Uri.parse(entry.uri), entry.position, entry.name, revealControls = false)
                 }
             }
         }
@@ -377,14 +377,13 @@ class MainActivity : Activity() {
     }
 
     private fun applyPageInsets(insets: WindowInsets?) {
-        val cutout = insets?.displayCutout
-        val left = cutout?.safeInsetLeft ?: 0
-        val right = cutout?.safeInsetRight ?: 0
-        val top = cutout?.safeInsetTop ?: 0
-        val bottom = cutout?.safeInsetBottom ?: 0
+        val safe = android.graphics.Rect()
+        if (Build.VERSION.SDK_INT >= 28) insets?.displayCutout?.let {
+            safe.set(it.safeInsetLeft, it.safeInsetTop, it.safeInsetRight, it.safeInsetBottom)
+        }
         // Apply cached window insets before showing a lazy page, not one frame after its entrance.
-        if (::settingsPage.isInitialized) settingsPage.setPadding(dp(22) + left, dp(6) + top, dp(22) + right, bottom)
-        if (::playlistPage.isInitialized) playlistPage.setContentPadding(dp(18) + left, dp(8) + top, dp(18) + right, dp(8) + bottom)
+        if (::settingsPage.isInitialized) settingsPage.setPadding(dp(22) + safe.left, dp(6) + safe.top, dp(22) + safe.right, safe.bottom)
+        if (::playlistPage.isInitialized) playlistPage.setContentPadding(dp(18) + safe.left, dp(8) + safe.top, dp(18) + safe.right, dp(8) + safe.bottom)
     }
 
     @Suppress("DEPRECATION")
@@ -392,9 +391,11 @@ class MainActivity : Activity() {
         val decor = window.decorView
         window.attributes = window.attributes.apply {
             screenBrightness = brightness
-            layoutInDisplayCutoutMode = if (Build.VERSION.SDK_INT >= 30)
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-            else WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            if (Build.VERSION.SDK_INT >= 28) {
+                layoutInDisplayCutoutMode = if (Build.VERSION.SDK_INT >= 30)
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                else WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
         if (Build.VERSION.SDK_INT >= 30) {
             window.setDecorFitsSystemWindows(false)
@@ -995,7 +996,7 @@ class MainActivity : Activity() {
             setPadding(dp(12), dp(7), dp(12), dp(7))
             background = UiStyle.shape(this@MainActivity, UiStyle.SURFACE, 18)
         }
-        languageSettingsCard.addView(label(AppText.LANGUAGE.text(), 14f).apply {
+        languageSettingsCard.addView(label("语言/Language", 14f).apply {
             setTypeface(typeface, Typeface.BOLD)
         }, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(6) })
         languageSettingsCard.addView(button(AppText.LANGUAGE_NAME.text()) {
@@ -1003,7 +1004,7 @@ class MainActivity : Activity() {
                 changeLanguage(it == 1)
             }
         }, LinearLayout.LayoutParams(dp(156), dp(40)))
-        left.addView(languageSettingsCard, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) })
+        left.addView(languageSettingsCard, 1, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) })
         val display = card(right, AppText.SCREEN_CALIBRATION.text(), AppText.CENTER_THE_CIRCULAR_VIEWS_USING_THE.text())
         doubleLensOptions.add(display)
         screenInfo = label("", 11f).apply { setTextColor(UiStyle.MUTED); setLineSpacing(dp(1).toFloat(), 1f) }
@@ -1027,8 +1028,6 @@ class MainActivity : Activity() {
         hdrSwitch.alpha = if (hdrSwitch.isEnabled) 1f else .5f
         hdrInfo = label("", 11f).apply { setTextColor(UiStyle.MUTED); setPadding(0, dp(6), 0, 0) }
         ordinaryPicture.addView(hdrInfo)
-        left.removeView(languageSettingsCard)
-        left.addView(languageSettingsCard, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) })
         val ordinaryControls = card(right, AppText.CONTROLS.text(), AppText.TOUCH_AND_ROTATION_SETTINGS_FOR_STANDARD.text())
         ordinaryControlsCard = ordinaryControls
         pinchSwitch = toggle(ordinaryControls, AppText.PINCH_TO_ZOOM.text(), AppText.PINCH_TO_ZOOM_AND_DRAG_TO.text(), prefs.getBoolean("flat_pinch_enabled", true)) {
@@ -1665,7 +1664,8 @@ class MainActivity : Activity() {
         syncBackCallback()
     }
 
-    private fun openSource(uri: Uri, resumePosition: Long? = null, name: String? = null, autoplay: Boolean = true) {
+    private fun openSource(uri: Uri, resumePosition: Long? = null, name: String? = null,
+        autoplay: Boolean = true, revealControls: Boolean = true) {
         val exactSessionPosition = restoredLanguagePosition
         restoredLanguagePosition = null
         releasePlayer()
@@ -1725,7 +1725,7 @@ class MainActivity : Activity() {
                 vrView.retryOutput()
             } else ensurePlayer()
         }
-        showControls(true)
+        showControls(revealControls || failure != null)
         updateStatus()
     }
 
@@ -1924,7 +1924,7 @@ class MainActivity : Activity() {
             }
             vrView.cancelPendingGestures()
             gamepad.clearInput()
-            openSource(Uri.parse(entry.uri), 0L, entry.name)
+            openSource(Uri.parse(entry.uri), 0L, entry.name, revealControls = controlsVisible)
             boundarySeek.suppressUntilIdle(SystemClock.elapsedRealtime())
             stereoHint.showValue("${if (direction > 0) AppText.NEXT.text() else AppText.PREVIOUS.text()} · ${entry.name}")
         }
@@ -1989,6 +1989,8 @@ class MainActivity : Activity() {
     private fun beginControllerUse() {
         handler.removeCallbacks(hideNotice)
         noticeView?.visibility = View.GONE
+        // Continuous stick input must not restart the hide animation on every frame.
+        if (controlsVisible) showControls(false)
     }
 
     private fun changeSpeed(direction: Int) {

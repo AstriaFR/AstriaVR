@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AstriaVR</string>
-    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+    <style name="AppTheme" parent="BaseAppTheme"/>
+    <style name="BaseAppTheme" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:alertDialogTheme">@style/LocalDialogTheme</item>
         <item name="android:colorAccent">#87D9FF</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowBackground">#000000</item>
         <item name="android:windowNoTitle">true</item>
     </style>
-    <style name="ConfirmationTheme" parent="android:style/Theme.Material.Dialog.Alert">
+    <style name="ConfirmationTheme" parent="BaseConfirmationTheme"/>
+    <style name="BaseConfirmationTheme" parent="android:style/Theme.Material.Dialog.Alert">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowMinWidthMajor">0dp</item>
@@ -19,7 +20,6 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.64</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:colorAccent">#87D9FF</item>
     </style>
     <style name="LocalDialogTheme" parent="android:style/Theme.Material.Dialog.Alert">

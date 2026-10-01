@@ -83,10 +83,28 @@ class RegressionTests : InstrumentationTestCase() {
         super.tearDown()
     }
 
+    fun testDefaultLanguageAndSavedChoice() {
+        assertFalse("Fresh settings default to Chinese", AppText.isEnglish())
+        AppLanguage.select(context, true)
+        AppText.setEnglish(false)
+        AppLanguage.load(context)
+        assertTrue("Explicit English selection survives reload", AppText.isEnglish())
+        AppLanguage.select(context, false)
+        AppText.setEnglish(true)
+        AppLanguage.load(context)
+        assertFalse("Explicit Chinese selection survives reload", AppText.isEnglish())
+    }
+
+    fun testLauncherIconIsAdaptiveOnSupportedAndroidVersions() {
+        val icon = context.packageManager.getApplicationIcon(context.packageName)
+        assertTrue("Android 8-12 must also receive an adaptive icon, not a legacy square bitmap",
+            icon is android.graphics.drawable.AdaptiveIconDrawable)
+    }
+
     fun testLanguageRecreationPreservesVideoAndSettings() {
         var screen = launch()
         val uri = sample()
-        main { invoke(screen, "openSource", uri, 4500L, "test-pattern.mp4", false) }
+        main { invoke(screen, "openSource", uri, 4500L, "test-pattern.mp4", false, true) }
         eventually("paused sample not ready") { (field(screen, "player") as? ExoPlayer)?.playbackState == Player.STATE_READY }
         main { invoke(screen, "openSettingsPage") }
         for (english in listOf(true, false)) {
@@ -154,19 +172,22 @@ class RegressionTests : InstrumentationTestCase() {
                             assertEquals("Compact header button height", UiStyle.dp(screen, 40), tuning.height)
                         }
                         val language = field(screen, "languageSettingsCard") as View
+                        assertEquals("Bilingual language title", "语言/Language",
+                            ((language as android.view.ViewGroup).getChildAt(0) as TextView).text.toString())
+                        assertTrue("Language follows viewing mode", language.top >= modeCard.bottom)
                         val body = field(screen, "settingsBody") as View
                         assertTrue("Language must occupy half a row", kotlin.math.abs(language.width * 2 + UiStyle.dp(screen, 12) - body.width) <= 2)
                         val columns = field(screen, "settingsColumns") as android.widget.LinearLayout
                         assertEquals("Settings must stay side by side", android.widget.LinearLayout.HORIZONTAL, columns.orientation)
                         assertTrue("Left and right cards overlap", columns.getChildAt(0).right < columns.getChildAt(1).left)
                         if (mode != 2) {
-                            assertTrue("Language must follow Picture", language.top >= (field(screen, "visualCard") as View).bottom)
+                            assertTrue("Language precedes Picture", language.bottom <= (field(screen, "visualCard") as View).top)
                         } else {
                             val picture = field(screen, "ordinaryPictureCard") as View
                             val controls = field(screen, "ordinaryControlsCard") as View
                             assertSame("2D picture on the left", columns.getChildAt(0), picture.parent)
                             assertSame("2D controls on the right", columns.getChildAt(1), controls.parent)
-                            assertTrue("Language must follow 2D Picture", language.top >= picture.bottom)
+                            assertTrue("Language precedes 2D Picture", language.bottom <= picture.top)
                             val right = columns.getChildAt(1) as android.view.ViewGroup
                             assertEquals("Only controls occupy the right column", 1, (0 until right.childCount).count { right.getChildAt(it).visibility == View.VISIBLE })
                         }
@@ -222,7 +243,7 @@ class RegressionTests : InstrumentationTestCase() {
 
     fun testCompletedVideoDoesNotReplayWhenOutputChanges() {
         val screen = launch()
-        main { invoke(screen, "openSource", sample(), 0L, "ordinary.mp4", true) }
+        main { invoke(screen, "openSource", sample(), 0L, "ordinary.mp4", true, true) }
         eventually("sample starts") { (field(screen, "player") as? ExoPlayer)?.isPlaying == true }
         main {
             val player = field(screen, "player") as ExoPlayer
@@ -286,17 +307,82 @@ class RegressionTests : InstrumentationTestCase() {
         assertTrue(entry.id>0)
     }
 
+    fun testControllerPlaylistKeepsBarsHiddenAndDrawsBothEyes() {
+        val uri = sample()
+        val secondFile = File(context.filesDir, "second_VR180.mp4")
+        File(uri.path!!).copyTo(secondFile, overwrite = true)
+        val secondUri = Uri.fromFile(secondFile)
+        val screen = launch()
+        main { invoke(screen, "openSource", uri, 0L, "test-pattern.mp4", false, true) }
+        eventually("first video ready") { (field(screen, "player") as? ExoPlayer)?.playbackState == Player.STATE_READY }
+        main { invoke(screen, "setViewingMode", 0) }
+        eventually("VR mode ready") {
+            screen.hasWindowFocus() && (field(screen, "player") as? ExoPlayer)?.playbackState == Player.STATE_READY
+        }
+        val added = CountDownLatch(1)
+        main {
+            val store = field(screen, "playlist") as PlaylistStore
+            store.submit({ store.add(secondUri.toString(), secondFile.name) }) {
+                assertTrue(it.isSuccess); added.countDown()
+            }
+            invoke(screen, "showControls", true)
+            invoke(screen, "onControllerAction", GamepadState.Action.RECENTER, true)
+            assertFalse("Controller action hides controls", field(screen, "controlsVisible") as Boolean)
+            (field(screen, "vrView") as VrView).onTap()
+            assertTrue("Touch can reveal controls again", field(screen, "controlsVisible") as Boolean)
+        }
+        await(added)
+        main { invoke(screen, "toggleVrPlaylist") }
+        val view = field(screen, "vrPlaylist") as VrPlaylistView
+        eventually("playlist loaded and bars hidden") {
+            field(view, "displayCount") == 2 && view.alpha == 1f &&
+                (field(screen, "topBar") as View).visibility == View.GONE &&
+                (field(screen, "bottomBar") as View).visibility == View.GONE
+        }
+        main {
+            val saved = view.settings
+            for (ipd in listOf(5f, 6.5f, 8f)) {
+                view.settings = saved.copy(ipdCm = ipd).fitScreen()
+                val layout = view.settings.opticalLayout(view.width, view.height)
+                val image = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+                view.draw(Canvas(image))
+                val y = view.height - layout.y - layout.eyeHeight
+                val left = Bitmap.createBitmap(image, layout.leftX, y, layout.eyeWidth, layout.eyeHeight)
+                val right = Bitmap.createBitmap(image, layout.rightX, y, layout.eyeWidth, layout.eyeHeight)
+                assertTrue("Both eyes draw the same playlist at IPD $ipd", left.sameAs(right))
+                val pixels = IntArray(left.width * left.height)
+                left.getPixels(pixels, 0, left.width, 0, 0, left.width, left.height)
+                assertTrue("Eye image contains visible playlist content", pixels.any { it ushr 24 != 0 })
+                left.recycle(); right.recycle(); image.recycle()
+            }
+            view.settings = saved
+            view.move(if ((field(view, "selected") as Int) == 0) 1 else -1)
+            assertEquals(secondUri.toString(), view.selection()!!.uri)
+            val input = field(screen, "playlistInput") as PlaylistInput
+            input.handleKey(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_DPAD_UP), true)
+            assertEquals(secondUri, field(screen, "source"))
+            assertFalse("Selecting another video must never reveal controls", field(screen, "controlsVisible") as Boolean)
+            input.handleKey(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_DPAD_UP), true)
+        }
+        eventually("selected video starts") { (field(screen, "player") as? ExoPlayer)?.isPlaying == true }
+        main {
+            assertFalse("Asynchronous preparation keeps controls hidden", field(screen, "controlsVisible") as Boolean)
+            assertEquals(View.GONE, (field(screen, "topBar") as View).visibility)
+            assertEquals(View.GONE, (field(screen, "bottomBar") as View).visibility)
+        }
+    }
+
     fun testPlaybackResumeModesAndListLifecycle() {
         val uri=sample(); val screen=launch()
         fun current()=field(screen,"player") as? ExoPlayer
-        main { invoke(screen,"openSource",uri,null,"test-pattern.mp4",false) }
+        main { invoke(screen,"openSource",uri,null,"test-pattern.mp4",false,true) }
         eventually("ordinary video never became ready") { current()?.playbackState==Player.STATE_READY }
         main {
             assertEquals(12000L,current()!!.duration)
             current()!!.seekTo(4500)
             invoke(screen,"savePosition")
             invoke(screen,"stopCurrentVideo")
-            invoke(screen,"openSource",uri,null,"test-pattern.mp4",false)
+            invoke(screen,"openSource",uri,null,"test-pattern.mp4",false,true)
         }
         eventually("reopened video never became ready") { current()?.playbackState==Player.STATE_READY }
         main { assertTrue("picker resume was lost",current()!!.currentPosition in 4400..4600) }
@@ -320,7 +406,7 @@ class RegressionTests : InstrumentationTestCase() {
         eventually("rapid reopen hid the playlist") { page.visibility==View.VISIBLE && field(page,"query")==null }
         main {
             invoke(screen,"closePlaylistPage",false)
-            invoke(screen,"openSource",uri,0L,"test-pattern.mp4",false)
+            invoke(screen,"openSource",uri,0L,"test-pattern.mp4",false,true)
         }
         eventually("restart never became ready") { current()?.playbackState==Player.STATE_READY }
         main { assertEquals("explicit restart must ignore history",0L,current()!!.currentPosition) }
