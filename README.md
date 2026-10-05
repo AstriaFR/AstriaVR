@@ -68,7 +68,7 @@ This version accesses user-selected video files through the Android system picke
 
 Use [Issues](../../issues) for bug reports and suggestions. Include the app version, Android version, device model, projection and reproduction steps. Do not attach private videos or sensitive logs. See [contribution guidance](CONTRIBUTING.md).
 
-bilibili @雨星衡 · GitHub [@AstriaFR](https://github.com/AstriaFR)
+GitHub [@AstriaFR](https://github.com/AstriaFR)
 
 ## License status
 

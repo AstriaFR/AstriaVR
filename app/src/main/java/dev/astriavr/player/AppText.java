@@ -320,7 +320,7 @@ public enum AppText {
     DRAWING_VR_FRAME("绘制VR画面", "Drawing VR frame"),
     COULD_NOT_UPDATE_VIDEO_TEXTURE("视频纹理更新失败：{0}", "Could not update video texture: {0}");
 
-    private static volatile boolean english = false;
+    private static volatile boolean english = true;
     private static final Pattern ARGUMENT = Pattern.compile("\\{(\\d+)\\}");
     private final String chinese;
     private final String translated;

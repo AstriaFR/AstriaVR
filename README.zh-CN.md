@@ -71,7 +71,7 @@ AstriaVR 支持手机直看和双镜头 VR 观看，提供播放列表、进度�
 
 欢迎通过 [Issues](../../issues) 报告问题或提出建议。请附应用版本、Android 版本、设备型号、片源投影及复现步骤，避免上传私人视频和敏感日志。详见 [贡献与反馈说明](CONTRIBUTING.md)。
 
-bilibili @雨星衡 · GitHub [@AstriaFR](https://github.com/AstriaFR)
+GitHub [@AstriaFR](https://github.com/AstriaFR)
 
 ## 许可说明
 

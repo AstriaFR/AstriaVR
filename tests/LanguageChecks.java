@@ -17,7 +17,7 @@ public class LanguageChecks {
         return result;
     }
     public static void main(String[] args) {
-        check(!AppText.isEnglish(), "Initial catalog language is Chinese");
+        check(AppText.isEnglish(), "Initial catalog language is English");
         Object[] values = {"片名 $1 \\ {1}.mp4", "720", "30", "4", "5", "6", "7", "8", "9"};
         for (AppText key : AppText.values()) {
             AppText.setEnglish(false); String zh = key.text();

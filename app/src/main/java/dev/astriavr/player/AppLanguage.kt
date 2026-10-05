@@ -10,7 +10,7 @@ object AppLanguage {
 
     fun load(context: Context) {
         AppText.setEnglish(context.getSharedPreferences("astriavr-settings", Context.MODE_PRIVATE)
-            .getString(KEY, "zh") == "en")
+            .getString(KEY, "en") == "en")
     }
 
     fun select(context: Context, english: Boolean) {

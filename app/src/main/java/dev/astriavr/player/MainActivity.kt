@@ -1068,7 +1068,7 @@ class MainActivity : Activity() {
         aboutSection(AppText.HOW_VIDEO_BECOMES_YOUR_VIEW.text(), AppText.MEDIA_EXOPLAYER_HANDLES_PLAYBACK_AND_SYSTEM.text())
         aboutSection(AppText.ADJUST_FOR_A_COMFORTABLE_VIEW.text(), AppText.IPD_SETS_THE_SPACING_BETWEEN_THE.text())
         aboutSection(AppText.USEFUL_DETAILS.text(), AppText.IN_DUAL_LENS_MODE_PRESS_MENU.text())
-        about.addView(label("bilibili @雨星衡  ·  github @AstriaFR", 12f).apply {
+        about.addView(label("GitHub @AstriaFR", 12f).apply {
             setTextColor(UiStyle.ACCENT); setPadding(0, dp(12), 0, 0)
         })
         settingsPage.addView(ScrollView(this).apply { isFillViewport = false; addView(body) }, LinearLayout.LayoutParams(-1, 0, 1f))
