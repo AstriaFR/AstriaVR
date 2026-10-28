@@ -14,7 +14,7 @@ Watch on your phone or through a dual-lens VR headset, with playlists, saved pla
 | Languages | Kotlin, Java |
 | Playback | AndroidX Media3 / ExoPlayer |
 | Application ID | `dev.astriavr.player` |
-| Source license | No open-source license selected |
+| Source license | [GNU GPL 3.0](LICENSE) |
 
 ## Features
 
@@ -70,6 +70,6 @@ Use [Issues](../../issues) for bug reports and suggestions. Include the app vers
 
 GitHub [@AstriaFR](https://github.com/AstriaFR)
 
-## License status
+## License
 
-The source is public, but **no open-source license has been added**. Public visibility is not an additional grant of permission to use, modify or redistribute the project. Third-party dependencies retain their own license terms.
+This project is licensed under the [GNU General Public License v3.0](LICENSE). Third-party dependencies retain their own license terms.

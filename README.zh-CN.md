@@ -14,7 +14,7 @@ AstriaVR 支持手机直看和双镜头 VR 观看，提供播放列表、进度�
 | 开发语言 | Kotlin、Java |
 | 播放引擎 | AndroidX Media3 / ExoPlayer |
 | 应用 ID | `dev.astriavr.player` |
-| 源码许可 | 暂未添加开源许可证 |
+| 源码许可 | [GNU GPL 3.0](LICENSE) |
 
 ## 功能
 
@@ -75,4 +75,4 @@ GitHub [@AstriaFR](https://github.com/AstriaFR)
 
 ## 许可说明
 
-本仓库公开源码，但目前**未添加开源许可证**，不将公开可见视为额外授予使用、修改或再分发许可。第三方依赖按各自许可证提供；本说明不改变其许可条件。
+本项目采用 [GNU 通用公共许可证第 3 版](LICENSE)。第三方依赖仍遵循各自的许可证条款。

@@ -9,7 +9,7 @@
 
 请不要上传私人视频、密码、签名密钥或其他敏感信息。优先用测试图案或可公开分享的素材复现。
 
-本仓库暂未选择开源许可证。如有代码贡献或再利用计划，请先通过 Issue 与维护者讨论许可安排；此文档本身不授予额外许可。
+本项目采用 GNU GPL 3.0 许可证，详见 [LICENSE](LICENSE)。第三方依赖遵循各自的许可证。
 
 ---
 
@@ -17,4 +17,4 @@ Please use Issues for bugs and feature requests. Include the app / Android versi
 
 Do not upload private videos, passwords, signing keys or sensitive data. Prefer test patterns or material you can share publicly.
 
-No open-source license has been selected. Discuss licensing with the maintainer before proposing code contributions or reuse; this document does not grant additional permissions.
+This project is licensed under GNU GPL 3.0; see [LICENSE](LICENSE). Third-party dependencies retain their own licenses.
